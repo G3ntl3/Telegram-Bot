@@ -1,7 +1,7 @@
 // Load environment variables
 require("dotenv").config();
 
-const BOT_TOKEN='8013325969:AAGBPz0KzTfODhsnx3rssfwQU_CmKCpKb_I';
+const BOT_TOKEN = "8013325969:AAGBPz0KzTfODhsnx3rssfwQU_CmKCpKb_I";
 const ADMIN_IDS = process.env.ADMIN_IDS
   ? process.env.ADMIN_IDS.split(",").map((id) => Number(id.trim()))
   : [];
@@ -14,7 +14,6 @@ if (!BOT_TOKEN) {
   console.error("❌ BOT_TOKEN is required in environment variables");
   process.exit(1);
 }
-
 
 if (ADMIN_IDS.length === 0) {
   console.warn(
@@ -148,6 +147,11 @@ class ModerationBot {
     this.bot.on("polling_start", () => {
       console.log("✅ Bot polling started successfully");
     });
+  }
+
+  handleMessage(msg) {
+    // TODO: Implement your message handling logic here
+    console.log("Received message:", msg.text);
   }
 
   // [Include all your other methods here - they remain the same]
