@@ -167,7 +167,6 @@ class ModerationBot {
         console.error(err);
       });
   }
-
   sendWhitepaper(msg) {
     this.bot.sendMessage(
       msg.chat.id,
