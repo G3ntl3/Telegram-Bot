@@ -1,0 +1,6 @@
+{
+  "deploy": {
+    "startCommand": "node bot.js",
+    "restartPolicyType": "always"
+  }
+}
