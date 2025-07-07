@@ -111,6 +111,52 @@ class ModerationBot {
     return { question: `${a} ${operation} ${b}`, answer };
   }
 
+  muteUser(msg, match) {
+    // Example: Only admins can mute
+    if (!this.isAdmin(msg.from.id)) {
+      this.bot.sendMessage(msg.chat.id, "❌ Only admins can use this command.");
+      return;
+    }
+
+    // Get mute duration from command, default to 10 minutes if not specified
+    const duration = match[1] ? parseInt(match[1], 10) : 10;
+    if (isNaN(duration) || duration <= 0) {
+      this.bot.sendMessage(
+        msg.chat.id,
+        "❌ Please specify a valid mute duration in minutes."
+      );
+      return;
+    }
+
+    // You need to reply to a user's message to mute them
+    if (!msg.reply_to_message) {
+      this.bot.sendMessage(
+        msg.chat.id,
+        "❌ Please reply to the user's message you want to mute."
+      );
+      return;
+    }
+
+    const userId = msg.reply_to_message.from.id;
+    const untilDate = Math.floor(Date.now() / 1000) + duration * 60;
+
+    this.bot
+      .restrictChatMember(msg.chat.id, userId, {
+        can_send_messages: false,
+        until_date: untilDate,
+      })
+      .then(() => {
+        this.bot.sendMessage(
+          msg.chat.id,
+          `🔇 User muted for ${duration} minute(s).`
+        );
+      })
+      .catch((err) => {
+        this.bot.sendMessage(msg.chat.id, "❌ Failed to mute user.");
+        console.error(err);
+      });
+  }
+
   // [Rest of your existing methods remain the same...]
   // Just include all the methods from your original code here
 
