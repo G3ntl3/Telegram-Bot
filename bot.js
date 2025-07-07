@@ -1,7 +1,7 @@
 // Load environment variables
 require("dotenv").config();
 
-const BOT_TOKEN = process.env.BOT_TOKEN;
+const BOT_TOKEN='8013325969:AAGBPz0KzTfODhsnx3rssfwQU_CmKCpKb_I';
 const ADMIN_IDS = process.env.ADMIN_IDS
   ? process.env.ADMIN_IDS.split(",").map((id) => Number(id.trim()))
   : [];
