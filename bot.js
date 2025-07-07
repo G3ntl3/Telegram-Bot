@@ -139,11 +139,131 @@ class ModerationBot {
       });
   }
 
+  unmuteUser(msg) {
+    if (!this.isAdmin(msg.from.id)) {
+      this.bot.sendMessage(msg.chat.id, "❌ Only admins can use this command.");
+      return;
+    }
+    if (!msg.reply_to_message) {
+      this.bot.sendMessage(
+        msg.chat.id,
+        "❌ Please reply to the user's message you want to unmute."
+      );
+      return;
+    }
+    const userId = msg.reply_to_message.from.id;
+    this.bot
+      .restrictChatMember(msg.chat.id, userId, {
+        can_send_messages: true,
+        can_send_media_messages: true,
+        can_send_other_messages: true,
+        can_add_web_page_previews: true,
+      })
+      .then(() => {
+        this.bot.sendMessage(msg.chat.id, "🔊 User unmuted.");
+      })
+      .catch((err) => {
+        this.bot.sendMessage(msg.chat.id, "❌ Failed to unmute user.");
+        console.error(err);
+      });
+  }
+
   sendWhitepaper(msg) {
     this.bot.sendMessage(
       msg.chat.id,
       `📄 Project Whitepaper: ${PROJECT_WHITEPAPER}`
     );
+  }
+
+  warnUser(msg) {
+    if (!this.isAdmin(msg.from.id)) {
+      this.bot.sendMessage(msg.chat.id, "❌ Only admins can use this command.");
+      return;
+    }
+    if (!msg.reply_to_message) {
+      this.bot.sendMessage(
+        msg.chat.id,
+        "❌ Please reply to the user's message you want to warn."
+      );
+      return;
+    }
+    const userId = msg.reply_to_message.from.id;
+    const warnings = (this.userWarnings.get(userId) || 0) + 1;
+    this.userWarnings.set(userId, warnings);
+    this.saveData();
+    this.bot.sendMessage(
+      msg.chat.id,
+      `⚠️ User warned. Total warnings: ${warnings}`
+    );
+    if (warnings >= this.maxWarnings) {
+      this.muteUser(msg, [null, 10]); // Mute for 10 minutes
+      this.userWarnings.set(userId, 0);
+      this.saveData();
+    }
+  }
+
+  banUser(msg) {
+    if (!this.isAdmin(msg.from.id)) {
+      this.bot.sendMessage(msg.chat.id, "❌ Only admins can use this command.");
+      return;
+    }
+    if (!msg.reply_to_message) {
+      this.bot.sendMessage(
+        msg.chat.id,
+        "❌ Please reply to the user's message you want to ban."
+      );
+      return;
+    }
+    const userId = msg.reply_to_message.from.id;
+    this.bot
+      .kickChatMember(msg.chat.id, userId)
+      .then(() => {
+        this.bot.sendMessage(msg.chat.id, "🚫 User banned.");
+      })
+      .catch((err) => {
+        this.bot.sendMessage(msg.chat.id, "❌ Failed to ban user.");
+        console.error(err);
+      });
+  }
+
+  kickUser(msg) {
+    if (!this.isAdmin(msg.from.id)) {
+      this.bot.sendMessage(msg.chat.id, "❌ Only admins can use this command.");
+      return;
+    }
+    if (!msg.reply_to_message) {
+      this.bot.sendMessage(
+        msg.chat.id,
+        "❌ Please reply to the user's message you want to kick."
+      );
+      return;
+    }
+    const userId = msg.reply_to_message.from.id;
+    this.bot
+      .kickChatMember(msg.chat.id, userId)
+      .then(() => {
+        this.bot.unbanChatMember(msg.chat.id, userId); // Allow them to rejoin
+        this.bot.sendMessage(msg.chat.id, "👢 User kicked.");
+      })
+      .catch((err) => {
+        this.bot.sendMessage(msg.chat.id, "❌ Failed to kick user.");
+        console.error(err);
+      });
+  }
+
+  tagEveryone(msg) {
+    if (!this.isAdmin(msg.from.id)) {
+      this.bot.sendMessage(msg.chat.id, "❌ Only admins can use this command.");
+      return;
+    }
+    this.bot.getChatAdministrators(msg.chat.id).then((admins) => {
+      const mentions = admins
+        .map((a) =>
+          a.user.username ? `@${a.user.username}` : a.user.first_name
+        )
+        .join(" ");
+      this.bot.sendMessage(msg.chat.id, `👥 Everyone: ${mentions}`);
+    });
   }
 
   handleMessage(msg) {
@@ -165,6 +285,11 @@ class ModerationBot {
     this.bot.onText(/\/mute(?:\s+(\d+))?/, (msg, match) =>
       this.muteUser(msg, match)
     );
+    this.bot.onText(/\/unmute/, (msg) => this.unmuteUser(msg));
+    this.bot.onText(/\/warn/, (msg) => this.warnUser(msg));
+    this.bot.onText(/\/ban/, (msg) => this.banUser(msg));
+    this.bot.onText(/\/kick/, (msg) => this.kickUser(msg));
+    this.bot.onText(/\/everyone/, (msg) => this.tagEveryone(msg));
     this.bot.onText(/\/whitepaper/, (msg) => this.sendWhitepaper(msg));
     this.bot.on("message", (msg) => this.handleMessage(msg));
     this.bot.on("polling_error", (error) => {
