@@ -2,9 +2,7 @@
 require("dotenv").config();
 
 const BOT_TOKEN = "8013325969:AAGBPz0KzTfODhsnx3rssfwQU_CmKCpKb_I";
-const ADMIN_IDS = process.env.ADMIN_IDS
-  ? process.env.ADMIN_IDS.split(",").map((id) => Number(id.trim()))
-  : [];
+const ADMIN_IDS = [6934570829, 6934570829];
 const PROJECT_WHITEPAPER = "https://your-project.com/whitepaper.pdf";
 const BAD_WORDS = ["spam", "scam", "fake", "fuck", "hack", "pump", "dump"];
 const WHITELIST_LINKS = ["t.me", "telegram.org", "your-project.com"];
