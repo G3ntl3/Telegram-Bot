@@ -15,6 +15,7 @@ if (!BOT_TOKEN) {
   process.exit(1);
 }
 
+
 if (ADMIN_IDS.length === 0) {
   console.warn(
     "⚠️ No admin IDs configured. Bot will work but no admin commands will be available."
