@@ -1,16 +1,21 @@
 {
-  "name": "soul-community-bot",
+  "name": "piety-bot",
   "version": "1.0.0",
-  "description": "Telegram moderation bot for Soul Community",
-  "main": "bot.js",
+  "description": "Piety Community Telegram Moderation Bot",
+  "main": "index.js",
   "scripts": {
-    "start": "node bot.js",
-    "dev": "nodemon bot.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "dependencies": {
-    "axios": "^1.10.0",
-    "dotenv": "^17.0.1",
-    "fs-extra": "^11.3.0",
-    "node-telegram-bot-api": "^0.66.0"
+    "dotenv": "^16.0.3",
+    "express": "^5.1.0",
+    "node-telegram-bot-api": "^0.61.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  },
+  "engines": {
+    "node": ">=16.0.0"
   }
 }
